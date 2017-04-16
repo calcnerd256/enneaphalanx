@@ -74,15 +74,20 @@ Enneaphalanx.prototype.scene = {
 	    null,
 	    [
 		[],
-		new Scener([this.main], K(this.clear)),
-		new Scener([this.main], K(this.outline))
-	    ].concat(
-		sceneGraph.make_scene.apply(
-		    null,
+		new (Scener.Atomic)(
 		    [
-			[this.main]
-		    ].concat(stateScene)
-		),
+			new Scener([this.main], K(this.clear)),
+			new Scener([this.main], K(this.outline))
+		    ].concat(
+			sceneGraph.make_scene.apply(
+			    null,
+			    [
+				[this.main]
+			    ].concat(stateScene)
+			)
+		    )
+		)
+	    ].concat(
 		[0,1,2,3,4,5,6,7,8].map(
 		    (
 			function(that){

@@ -40,3 +40,34 @@ SceneGraph.prototype.Scener.prototype.step = function(
     var scene = scener.apply(this, cam);
     return this.make_scene.apply(this, [this.transforms].concat(scene));
 };
+
+SceneGraph.prototype.Scener.Atomic = function AtomicScener(steps){
+    this.steps = steps;
+};
+SceneGraph.prototype.Scener.Atomic.prototype.constructor = SceneGraph.prototype.Scener.Atomic;
+SceneGraph.prototype.Scener.Atomic.prototype.precompose = function precompose(transforms){
+    return new (this.constructor)(
+	this.steps.map(
+	    function(step){
+		return step.precompose(
+		    transforms
+		);
+	    }
+	)
+    );
+};
+SceneGraph.prototype.Scener.Atomic.prototype.camera = function camera(){
+    return [].slice.call(arguments);
+};
+SceneGraph.prototype.Scener.Atomic.prototype.make_scene = SceneGraph.prototype.Scener.make_scene;
+SceneGraph.prototype.Scener.Atomic.prototype.step = function step(){
+    var args = arguments;
+    return [].concat.apply(
+	[],
+	this.steps.map(
+	    function(step){
+		return step.step.apply(step, args);
+	    }
+	)
+    );
+};
