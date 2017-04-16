@@ -1,0 +1,45 @@
+<html>
+ <head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <title>enneaphalanx</title>
+  <style>
+   #canv {
+    border: 1px solid black;
+   }
+  </style>
+  <script src="./js/SceneGraph.js"></script>
+  <script src="./js/SceneGraph/prototype/get.js"></script>
+  <script src="./js/SceneGraph/prototype/dom.js"></script>
+  <script src="./js/SceneGraph/prototype/next_frame.js"></script>
+  <script src="./js/SceneGraph/prototype/frame.js"></script>
+  <script src="./js/SceneGraph/prototype/scene.js"></script>
+  <script src="./js/SceneGraph/prototype/step.js"></script>
+  <script src="./js/SceneGraph/prototype/make_scene.js"></script>
+  <script src="./js/SceneGraph/prototype/Scener.js"></script>
+  <script src="./js/Enneaphalanx.js"></script>
+  <script src="./js/Enneaphalanx/prototype/get.js"></script>
+  <script src="./js/Enneaphalanx/prototype/start.js"></script>
+  <script src="./js/Enneaphalanx/prototype/event.js"></script>
+  <script src="./js/Enneaphalanx/prototype/dom.js"></script>
+  <script src="./js/Enneaphalanx/prototype/scene.js"></script>
+  <script src="./js/Enneaphalanx/prototype/State.js"></script>
+  <script src="./js/Util.js"></script>
+  <script src="./js/example.js"></script>
+  <script>
+   window.applications = {
+    util: new Util(),
+    enneaphalanx: example()
+   };
+   function canvas_click(){
+    var enneaphalanx = window.applications.enneaphalanx;
+    return enneaphalanx.event.click.apply(enneaphalanx, arguments);
+   }
+  </script>
+ </head>
+ <body>
+  <canvas width="400" height="600" id="canv" onclick="canvas_click();" tabindex="1">
+   (no canvas, sorry)
+  </canvas>
+  <p id="start">click the canvas</p>
+ </body>
+</html>
