@@ -21,7 +21,6 @@ function example(){
 		return result;
 	    }
 	);
-	var sceneGraph = new SceneGraph("canv");
 	function filledSquare(fillStyle){
 	    return function(ctx, left, top, width, height, time){
 		var s = width;
@@ -81,7 +80,7 @@ function example(){
 	    result.transition = transition;
 	    return result;
 	}
-	return new Enneaphalanx(sceneGraph, "start", constructState);
+	return constructState;
     }
     function replacement(){
 	function scene(sceneGraph){
@@ -159,21 +158,100 @@ function example(){
 	    };
 	    return this.state.cache[i];
 	}
-	return new Enneaphalanx(
-	    new SceneGraph("canv"),
-	    "start",
-	    function constructState(parent){
-		var initial_state = {
-		    red: 0,
-		    green: 128,
-		    blue: 255,
-		    x: .5,
-		    cursor: "blue",
-		    parent: parent
-		};
-		return new Enneaphalanx.prototype.State(scene, transition, parent, initial_state);
-	    }
-	);
+	function constructState(parent){
+	    var initial_state = {
+		red: 0,
+		green: 128,
+		blue: 255,
+		x: .5,
+		cursor: "blue",
+		parent: parent
+	    };
+	    return new (Enneaphalanx.prototype.State)(
+		scene,
+		transition,
+		parent,
+		initial_state
+	    );
+	}
+	return constructState;
     }
-    return (!true?old:replacement)();
+    function collatz(){
+	function scene(sceneGraph){
+	    var K = this.parent.get("get")("K");
+	    return [
+		new (sceneGraph.Scener)(
+		    [],
+		    function(n){
+			return function(ctx, left, top, width, height, time){
+			    ctx.textBaseline = "top";
+			    ctx.fillText(n, left, top);
+			    return [];
+			}
+		    },
+		    K(this.state.n)
+		)
+	    ];
+	}
+	function transition(i){
+	    function go(n, i){
+		var upe = 0;
+		var halve = 1;
+		var distill = 2;
+		var backwards = 3;
+
+		var nextOdd = 4;
+
+		var step = 6;
+		var odd = 7;
+		var upo = 8;
+		if(i == halve){
+		    if(n % 2) return n;
+		    return n / 2;
+		}
+		if(i == distill){
+		    if(n % 2) return n;
+		    if(!n) return n;
+		    return go(go(n,halve),i);
+		}
+		if(i == odd) return 3 * n + 1;
+		if(i == step)
+		    return go(n, (n%2) ? odd : halve);
+		if(i == nextOdd)
+		    return go(go(n,step),distill);
+		if(i == upe) return 2 * n;
+		if(i == upo){
+		    if(1 == (n % 3))
+			return (n - 1) / 3;
+		    return n;
+		}
+		if(i == backwards){
+		    var m = go(n, upo);
+		    if(n == m) return go(n, upe);
+		    if(m % 2) return m;
+		    return go(n, upe);
+		}
+		return n + i - 4;
+	    }
+	    result = Object.create(this.state);
+	    result.n = go(this.state.n, i);
+	    return result;
+	}
+	function constructState(parent){
+	    var initial = {
+		n: 1,
+		parent: parent
+	    };
+	    return new (Enneaphalanx.prototype.State)(
+		scene,
+		transition,
+		parent,
+		initial
+	    );
+	}
+	return constructState;
+    }
+    var constructState = (true?collatz:replacement)();
+    var sceneGraph = new SceneGraph("canv");
+    return new Enneaphalanx(sceneGraph, "start", constructState);
 }
