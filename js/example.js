@@ -179,14 +179,98 @@ function example(){
     function collatz(){
 	function scene(sceneGraph){
 	    var K = this.parent.get("get")("K");
+	    function recur(n){
+		return function(ctx, left, top, width, height, time){
+		    ctx.textBaseline = "middle";
+		    ctx.fillText(n, left + width / 2, top + height / 2);
+		    if(width < 32) return [];
+		    var result = [];
+		    var m = n;
+		    if(n % 2) m = 3 * m + 1;
+		    else m /= 2;
+		    result.push(
+			new (sceneGraph.Scener)(
+			    [
+				function(ctx, left, top, width, height, time){
+				    return [
+					ctx,
+					left + width / 4,
+					top + height / 2,
+					width / 2,
+					height / 2
+				    ];
+				}
+			    ],
+			    recur,
+			    K(m)
+			)
+		    );
+		    result.push(
+			new (sceneGraph.Scener)(
+			    [
+				function(ctx, left, top, width, height, time){
+				    return [
+					ctx,
+					left + width / 2,
+					top,
+					width / 2,
+					height / 2
+				    ];
+				}
+			    ],
+			    recur,
+			    K(2 * n)
+			)
+		    );
+		    if(1 != (n % 3)) return result;
+		    m = (n-1) / 3;
+		    if(!(m % 2)) return result;
+		    result.push(
+			new (sceneGraph.Scener)(
+			    [
+				function(ctx, left, top, width, height, time){
+				    return [
+					ctx,
+					left,
+					top,
+					width / 2,
+					height / 2
+				    ];
+				}
+			    ],
+			    recur,
+			    K(m)
+			)
+		    );
+		    return result;
+		};
+	    }
 	    return [
 		new (sceneGraph.Scener)(
 		    [],
 		    function(n){
-			return function(ctx, left, top, width, height, time){
-			    ctx.textBaseline = "top";
-			    ctx.fillText(n, left, top);
-			    return [];
+			var r = recur(n);
+			return function(){
+			    function flatten(atomics){
+				return [].concat.apply(
+				    [],
+				    atomics.map(
+					function(atom){
+					    return atom.steps;
+					}
+				    )
+				);
+			    }
+			    var result = r.apply(this, arguments);
+			    var A = sceneGraph.Scener.Atomic;
+			    var a = new A(result);
+			    for(var i = 0; i < 5; i++)
+				a = new A(
+				    flatten(
+					a.step.apply(a, arguments)
+				    )
+				);
+			    return [a];
 			}
 		    },
 		    K(this.state.n)
@@ -195,16 +279,17 @@ function example(){
 	}
 	function transition(i){
 	    function go(n, i){
-		var upe = 0;
-		var halve = 1;
-		var distill = 2;
+		var upo = 0;
+		var odd = 1;
+		var step = 2;
 		var backwards = 3;
 
 		var nextOdd = 4;
 
-		var step = 6;
-		var odd = 7;
-		var upo = 8;
+		var distill = 6;
+		var halve = 7;
+		var upe = 8;
+
 		if(i == halve){
 		    if(n % 2) return n;
 		    return n / 2;

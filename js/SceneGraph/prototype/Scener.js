@@ -62,7 +62,7 @@ SceneGraph.prototype.Scener.Atomic.prototype.camera = function camera(){
 SceneGraph.prototype.Scener.Atomic.prototype.make_scene = SceneGraph.prototype.Scener.make_scene;
 SceneGraph.prototype.Scener.Atomic.prototype.step = function step(){
     var args = arguments;
-    return [].concat.apply(
+    var result = [].concat.apply(
 	[],
 	this.steps.map(
 	    function(step){
@@ -70,4 +70,6 @@ SceneGraph.prototype.Scener.Atomic.prototype.step = function step(){
 	    }
 	)
     );
+    if(!result.length) return result;
+    return [new (this.constructor)(result)];
 };
