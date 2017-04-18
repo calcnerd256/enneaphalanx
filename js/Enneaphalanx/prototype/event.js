@@ -11,6 +11,8 @@ Enneaphalanx.prototype.event = {
     },
     key: function canvas_key(evt){
 	var button_number = "aoeu htns".indexOf(evt.key);
+	if(-1 == button_number)
+	    button_number = "awdf jkl;".indexOf(evt.key); // S is already used by dvorak
 	if(-1 == button_number) return;
 	this.parent.state.keypresses.push(button_number);
     },

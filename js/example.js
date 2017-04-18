@@ -182,22 +182,38 @@ function example(){
 	    function recur(n){
 		return function(ctx, left, top, width, height, time){
 		    ctx.textBaseline = "middle";
-		    ctx.fillText(n, left + width / 2, top + height / 2);
-		    if(width < 32) return [];
-		    var result = [];
+		    ctx.fillStyle = "black";
 		    var m = n;
 		    if(n % 2) m = 3 * m + 1;
 		    else m /= 2;
+		    var reducenext = m;
+		    while(reducenext && !(reducenext%2))
+			reducenext /= 2;
+		    if(reducenext > n)
+			ctx.fillStyle = "blue";
+		    if(!(n%3))
+			ctx.fillStyle = "red";
+		    ctx.fillText(n, left + width / 2, top + height / 2);
+		    if(width < 32) return [];
+		    var result = [];
+		    var showInc = false;
 		    result.push(
 			new (sceneGraph.Scener)(
 			    [
 				function(ctx, left, top, width, height, time){
+				    width /= 2;
+				    height /= 2;
+				    if(!showInc)
+					left += width / 2;
+				    top += height;
+				    var gap = Math.sin(time[0] / 500) * 10;
 				    return [
 					ctx,
-					left + width / 4,
-					top + height / 2,
-					width / 2,
-					height / 2
+					left + gap,
+					top + gap,
+					width - 2 * gap,
+					height - 2 * gap,
+					time
 				    ];
 				}
 			    ],
@@ -205,16 +221,46 @@ function example(){
 			    K(m)
 			)
 		    );
+		    if(showInc)
+			result.push(
+			    new (sceneGraph.Scener)(
+				[
+				    function(ctx, left, top, width, height, time){
+					width /= 2;
+					height /= 2;
+					left += width;
+					top += height;
+					var gap = 5;
+					return [
+					    ctx,
+					    left + gap,
+					    top + gap,
+					    width - 2 * gap,
+					    height - 2 * gap,
+					    time
+					];
+				    }
+				],
+				recur,
+				K(n+1)
+			    )
+			);
 		    result.push(
 			new (sceneGraph.Scener)(
 			    [
 				function(ctx, left, top, width, height, time){
+				    width /= 2;
+				    height /= 2;
+				    left += width;
+				    //var gap = 5;
+				    var gap = Math.cos(time[0] / 500) * 10;
 				    return [
 					ctx,
-					left + width / 2,
-					top,
-					width / 2,
-					height / 2
+					left + gap,
+					top + gap,
+					width - 2 * gap,
+					height - 2 * gap,
+					time
 				    ];
 				}
 			    ],
@@ -229,12 +275,16 @@ function example(){
 			new (sceneGraph.Scener)(
 			    [
 				function(ctx, left, top, width, height, time){
+				    width /= 2;
+				    height /= 2;
+				    var gap = 5;
 				    return [
 					ctx,
-					left,
-					top,
-					width / 2,
-					height / 2
+					left + gap,
+					top + gap,
+					width - 2 * gap,
+					height - 2 * gap,
+					time
 				    ];
 				}
 			    ],
